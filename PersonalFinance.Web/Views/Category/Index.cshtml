@@ -1,0 +1,52 @@
+﻿@model IEnumerable<PersonalFinance.Core.Entities.Category>
+@{
+    ViewData["Title"] = "จัดการหมวดหมู่";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>จัดการหมวดหมู่รายรับ-รายจ่าย</h2>
+        <a asp-action="Create" class="btn btn-primary">+ เพิ่มหมวดหมู่ใหม่</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ชื่อหมวดหมู่</th>
+                        <th>ประเภท</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>
+                                <span class="badge @(item.Type == "Income" ? "bg-success" : "bg-danger")">
+                                    @(item.Type == "Income" ? "รายรับ" : "รายจ่าย")
+                                </span>
+                            </td>
+                            <td>
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('ต้องการลบหมวดหมู่นี้ใช่หรือไม่?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">ลบ</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,36 @@
+﻿@model PersonalFinance.Application.ViewModels.Category.CategoryFormViewModel
+@{
+    ViewData["Title"] = "เพิ่มหมวดหมู่";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">เพิ่มหมวดหมู่ใหม่</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">ชื่อหมวดหมู่</label>
+                            <input asp-for="Name" class="form-control" placeholder="เช่น ค่าอาหาร, เงินเดือน" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">ประเภท</label>
+                            <select asp-for="Type" class="form-select">
+                                <option value="Expense">รายจ่าย (Expense)</option>
+                                <option value="Income">รายรับ (Income)</option>
+                            </select>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">บันทึก</button>
+                            <a asp-action="Index" class="btn btn-light">ย้อนกลับ</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

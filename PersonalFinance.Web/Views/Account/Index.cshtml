@@ -1,0 +1,46 @@
+﻿@model IEnumerable<PersonalFinance.Core.Entities.Account>
+@{
+    ViewData["Title"] = "จัดการบัญชี";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>จัดการบัญชีการเงิน</h2>
+        <a asp-action="Create" class="btn btn-primary">+ เพิ่มบัญชีใหม่</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ชื่อบัญชี</th>
+                        <th>ประเภท</th>
+                        <th>ยอดเงินคงเหลือ</th>
+                        <th>สกุลเงิน</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Name</td>
+                                <td>@item.Type</td>
+                                <td>@item.Balance.ToString("N2")</td>
+                                <td>@item.Currency</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">ยังไม่มีข้อมูลบัญชี</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
