@@ -1,0 +1,110 @@
+﻿@model PersonalFinance.Application.ViewModels.Transaction.TransactionFormViewModel
+@{
+    ViewData["Title"] = "บันทึกรายการใหม่";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">บันทึกธุรกรรมทางการเงิน</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- ประเภทธุรกรรม -->
+                        <div class="mb-3">
+                            <label class="form-label">ประเภท</label>
+                            <select asp-for="Type" class="form-select" id="transactionType" onchange="toggleFields()">
+                                <option value="2">รายจ่าย (Expense)</option>
+                                <option value="1">รายรับ (Income)</option>
+                                <option value="3">โอนเงิน (Transfer)</option>
+                            </select>
+                        </div>
+
+                        <div class="row mb-3">
+                            <!-- บัญชี (ต้นทาง) -->
+                            <div class="col-md-6">
+                                <label class="form-label" id="lblAccount">บัญชี</label>
+                                <select asp-for="AccountId" class="form-select" asp-items="ViewBag.Accounts">
+                                    <option value="">-- เลือกบัญชี --</option>
+                                </select>
+                                <span asp-validation-for="AccountId" class="text-danger"></span>
+                            </div>
+
+                            <!-- บัญชีปลายทาง (สำหรับโอนเงินเท่านั้น) -->
+                            <div class="col-md-6" id="divToAccount" style="display: none;">
+                                <label class="form-label text-primary">ไปยังบัญชี (ปลายทาง)</label>
+                                <select asp-for="ToAccountId" class="form-select" asp-items="ViewBag.Accounts">
+                                    <option value="">-- เลือกบัญชีปลายทาง --</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- หมวดหมู่ (ซ่อนเมื่อเป็นการโอน) -->
+                        <div class="mb-3" id="divCategory">
+                            <label class="form-label">หมวดหมู่</label>
+                            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories">
+                                <option value="">-- เลือกหมวดหมู่ --</option>
+                            </select>
+                        </div>
+
+                        <!-- จำนวนเงิน และ วันที่ -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">จำนวนเงิน (บาท)</label>
+                                <input asp-for="Amount" class="form-control" type="number" step="0.01" />
+                                <span asp-validation-for="Amount" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">วันที่</label>
+                                <input asp-for="Date" class="form-control" type="date" />
+                            </div>
+                        </div>
+
+                        <!-- คำอธิบาย -->
+                        <div class="mb-3">
+                            <label class="form-label">บันทึกช่วยจำ (ทางเลือก)</label>
+                            <input asp-for="Description" class="form-control" placeholder="เช่น ค่าอาหารกลางวัน, เงินเดือนเข้า..." />
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">บันทึกข้อมูล</button>
+                            <a asp-controller="Dashboard" asp-action="Index" class="btn btn-light">ยกเลิก</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // ฟังก์ชันปรับหน้าจอให้สอดคล้องกับประเภทธุรกรรม
+        function toggleFields() {
+            var type = document.getElementById("transactionType").value;
+            var divToAccount = document.getElementById("divToAccount");
+            var divCategory = document.getElementById("divCategory");
+            var lblAccount = document.getElementById("lblAccount");
+
+            if (type === "3") { // TransferOut
+                divToAccount.style.display = "block";
+                divCategory.style.display = "none";
+                lblAccount.innerText = "จากบัญชี (ต้นทาง)";
+            } else {
+                divToAccount.style.display = "none";
+                divCategory.style.display = "block";
+                lblAccount.innerText = "บัญชี";
+            }
+        }
+
+        // เรียกใช้งานตอนโหลดหน้าครั้งแรก
+        document.addEventListener("DOMContentLoaded", function() {
+            toggleFields();
+        });
+    </script>
+}
