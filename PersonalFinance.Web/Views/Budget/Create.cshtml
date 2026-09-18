@@ -1,0 +1,48 @@
+﻿@model PersonalFinance.Application.ViewModels.Budget.BudgetFormViewModel
+@{
+    ViewData["Title"] = "ตั้งงบประมาณใหม่";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0">ตั้งงบประมาณใหม่ (เดือนปัจจุบัน)</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        
+                        <div class="mb-3">
+                            <label asp-for="CategoryId" class="form-label">หมวดหมู่รายจ่าย</label>
+                            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.ExpenseCategories">
+                                <option value="">-- เลือกหมวดหมู่ --</option>
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                            <div class="form-text text-muted">* แสดงเฉพาะหมวดหมู่ประเภท "รายจ่าย" เท่านั้น</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Amount" class="form-label">จำนวนเงิน (บาท)</label>
+                            <input asp-for="Amount" class="form-control" type="number" step="0.01" placeholder="เช่น 5000" />
+                            <span asp-validation-for="Amount" class="text-danger"></span>
+                        </div>
+
+                        <!-- ซ่อนฟิลด์เดือนและปีไว้ เพราะเราตั้ง Default เป็นเดือนปัจจุบันใน ViewModel แล้ว -->
+                        <input type="hidden" asp-for="Month" />
+                        <input type="hidden" asp-for="Year" />
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-outline-secondary">ยกเลิก</a>
+                            <button type="submit" class="btn btn-primary">บันทึกงบประมาณ</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -4,6 +4,6 @@ namespace PersonalFinance.Application.Interfaces
 {
     public interface IDashboardService
     {
-        Task<DashboardViewModel> GetDashboardSummaryAsync(Guid userId, int month, int year);
+        Task<DashboardViewModel> GetDashboardSummaryAsync(Guid userId);
     }
 }

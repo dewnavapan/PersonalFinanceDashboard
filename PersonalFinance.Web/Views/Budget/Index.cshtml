@@ -1,7 +1,70 @@
-﻿@{
+﻿@model IEnumerable<PersonalFinance.Application.ViewModels.Budget.BudgetProgressViewModel>
+@{
     ViewData["Title"] = "จัดการงบประมาณ";
 }
+
 <div class="container mt-4">
-    <h2>ระบบจัดการงบประมาณ (Budget Management)</h2>
-    <p class="text-muted">กำลังพัฒนาในเฟสถัดไป...</p>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>งบประมาณประจำเดือน @ViewBag.CurrentMonth</h2>
+        <a asp-action="Create" class="btn btn-primary">+ ตั้งงบประมาณใหม่</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    <div class="row">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <h5 class="card-title mb-0">@item.CategoryName</h5>
+                                <span class="badge @item.StatusColor">@item.StatusText</span>
+                            </div>
+                            
+                            <div class="mb-2 d-flex justify-content-between text-muted small">
+                                <span>ใช้ไป: ฿@item.UsedAmount.ToString("N2")</span>
+                                <span>งบ: ฿@item.BudgetAmount.ToString("N2")</span>
+                            </div>
+
+                            <div class="progress mb-2" style="height: 20px;">
+                                <div class="progress-bar @item.StatusColor" role="progressbar" 
+                                     style="width: @Math.Min(item.UsagePercentage, 100)%;" 
+                                     aria-valuenow="@item.UsagePercentage" aria-valuemin="0" aria-valuemax="100">
+                                    @item.UsagePercentage.ToString("0.0")%
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                @if (item.RemainingAmount >= 0)
+                                {
+                                    <span class="text-success fw-bold">เหลือ: ฿@item.RemainingAmount.ToString("N2")</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger fw-bold">เกินงบ: ฿@Math.Abs(item.RemainingAmount).ToString("N2")</span>
+                                }
+                                
+                                <form asp-action="Delete" asp-route-id="@item.BudgetId" method="post" class="d-inline" onsubmit="return confirm('ต้องการลบงบประมาณนี้ใช่หรือไม่?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">ลบ</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center text-muted mt-5">
+                <p>ยังไม่มีการตั้งงบประมาณสำหรับเดือนนี้</p>
+                <a asp-action="Create" class="btn btn-outline-primary">คลิกเพื่อตั้งงบประมาณ</a>
+            </div>
+        }
+    </div>
 </div>

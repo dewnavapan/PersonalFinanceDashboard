@@ -14,40 +14,34 @@
                     <form asp-action="Create" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                        <!-- ประเภทธุรกรรม -->
                         <div class="mb-3">
                             <label class="form-label">ประเภท</label>
-                            <select asp-for="Type" class="form-select" id="transactionType" onchange="toggleFields()">
-                                <option value="2">รายจ่าย (Expense)</option>
-                                <option value="1">รายรับ (Income)</option>
-                                <option value="3">โอนเงิน (Transfer)</option>
+                            <select asp-for="Type" class="form-select" id="transactionType">
+                                <option value="Expense">รายจ่าย (Expense)</option>
+                                <option value="Income">รายรับ (Income)</option>
+                                <option value="TransferOut">โอนเงิน (Transfer)</option>
                             </select>
                         </div>
 
-                        <div class="row mb-3">
-                            <!-- บัญชี (ต้นทาง) -->
-                            <div class="col-md-6">
-                                <label class="form-label" id="lblAccount">บัญชี</label>
-                                <select asp-for="AccountId" class="form-select" asp-items="ViewBag.Accounts">
-                                    <option value="">-- เลือกบัญชี --</option>
-                                </select>
-                                <span asp-validation-for="AccountId" class="text-danger"></span>
-                            </div>
-
-                            <!-- บัญชีปลายทาง (สำหรับโอนเงินเท่านั้น) -->
-                            <div class="col-md-6" id="divToAccount" style="display: none;">
-                                <label class="form-label text-primary">ไปยังบัญชี (ปลายทาง)</label>
-                                <select asp-for="ToAccountId" class="form-select" asp-items="ViewBag.Accounts">
-                                    <option value="">-- เลือกบัญชีปลายทาง --</option>
-                                </select>
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label">บัญชี</label>
+                            <select asp-for="AccountId" class="form-select" asp-items="ViewBag.Accounts">
+                                <option value="">-- เลือกบัญชี --</option>
+                            </select>
+                            <span asp-validation-for="AccountId" class="text-danger"></span>
                         </div>
 
-                        <!-- หมวดหมู่ (ซ่อนเมื่อเป็นการโอน) -->
-                        <div class="mb-3" id="divCategory">
+                        <div class="mb-3" id="categoryGroup">
                             <label class="form-label">หมวดหมู่</label>
-                            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories">
+                            <select asp-for="CategoryId" class="form-select" id="categorySelect">
                                 <option value="">-- เลือกหมวดหมู่ --</option>
+                                @if (ViewBag.Categories != null)
+                                {
+                                    foreach (var cat in ViewBag.Categories)
+                                    {
+                                        <option value="@cat.Id" data-type="@cat.Type">@cat.Name</option>
+                                    }
+                                }
                             </select>
                         </div>
 
@@ -84,27 +78,43 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        // ฟังก์ชันปรับหน้าจอให้สอดคล้องกับประเภทธุรกรรม
-        function toggleFields() {
-            var type = document.getElementById("transactionType").value;
-            var divToAccount = document.getElementById("divToAccount");
-            var divCategory = document.getElementById("divCategory");
-            var lblAccount = document.getElementById("lblAccount");
+        document.addEventListener("DOMContentLoaded", function () {
+            const typeSelect = document.getElementById("transactionType");
+            const categorySelect = document.getElementById("categorySelect");
+            const categoryGroup = document.getElementById("categoryGroup");
 
-            if (type === "3") { // TransferOut
-                divToAccount.style.display = "block";
-                divCategory.style.display = "none";
-                lblAccount.innerText = "จากบัญชี (ต้นทาง)";
-            } else {
-                divToAccount.style.display = "none";
-                divCategory.style.display = "block";
-                lblAccount.innerText = "บัญชี";
+            function filterCategories() {
+                const selectedType = typeSelect.value;
+                let hasVisibleOptions = false;
+
+                // ซ่อนหมวดหมู่ถ้าเป็นการโอนเงิน
+                if (selectedType === "TransferOut") {
+                    categoryGroup.style.display = "none";
+                    categorySelect.value = "";
+                } else {
+                    categoryGroup.style.display = "block";
+                    // วนลูปซ่อน/แสดงหมวดหมู่ตามประเภท
+                    Array.from(categorySelect.options).forEach(option => {
+                        if (option.value === "") return; // ข้ามตัวเลือก default
+
+                        if (option.getAttribute("data-type") === selectedType) {
+                            option.style.display = "";
+                            hasVisibleOptions = true;
+                        } else {
+                            option.style.display = "none";
+                        }
+                    });
+
+                    // รีเซ็ตค่าถ้าหมวดหมู่ที่เลือกไว้ถูกซ่อน
+                    const currentOpt = categorySelect.options[categorySelect.selectedIndex];
+                    if (currentOpt && currentOpt.style.display === "none") {
+                        categorySelect.value = "";
+                    }
+                }
             }
-        }
 
-        // เรียกใช้งานตอนโหลดหน้าครั้งแรก
-        document.addEventListener("DOMContentLoaded", function() {
-            toggleFields();
+            typeSelect.addEventListener("change", filterCategories);
+            filterCategories(); // เรียกตอนโหลดหน้าครั้งแรก
         });
     </script>
 }

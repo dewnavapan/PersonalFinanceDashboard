@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Rendering; // เพิ่มบรรทัดนี้
 using PersonalFinance.Application.Interfaces;
 using PersonalFinance.Application.ViewModels.Transaction;
 
@@ -11,35 +11,35 @@ namespace PersonalFinance.Web.Controllers
     public class TransactionController : Controller
     {
         private readonly ITransactionService _transactionService;
-        private readonly IAccountService _accountService;
-        // private readonly ICategoryService _categoryService;
+        private readonly IAccountService _accountService; // เพิ่ม
+        private readonly ICategoryService _categoryService; // เพิ่ม
 
         public TransactionController(
             ITransactionService transactionService,
-            IAccountService accountService
-            /* ICategoryService categoryService */)
+            IAccountService accountService,
+            ICategoryService categoryService)
         {
             _transactionService = transactionService;
             _accountService = accountService;
-            // _categoryService = categoryService;
+            _categoryService = categoryService;
         }
 
-        private async Task PrepareDropdownsAsync(Guid userId)
+        private async Task LoadDropdownDataAsync(Guid userId)
         {
             var accounts = await _accountService.GetAccountsByUserIdAsync(userId);
-            // var categories = await _categoryService.GetCategoriesByUserIdAsync(userId);
+            var categories = await _categoryService.GetCategoriesByUserIdAsync(userId);
 
             ViewBag.Accounts = new SelectList(accounts, "Id", "Name");
-            // ViewBag.Categories = new SelectList(categories, "Id", "Name");
+            // ส่ง Categories ไปเป็น List ปกติเพื่อใช้กรองด้วย JavaScript
+            ViewBag.Categories = categories;
         }
 
         [HttpGet]
         public async Task<IActionResult> Create()
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            await PrepareDropdownsAsync(userId);
-
-            return View(new TransactionFormViewModel { Date = DateTime.Today });
+            await LoadDropdownDataAsync(userId);
+            return View(new TransactionFormViewModel());
         }
 
         [HttpPost]
@@ -50,7 +50,7 @@ namespace PersonalFinance.Web.Controllers
 
             if (!ModelState.IsValid)
             {
-                await PrepareDropdownsAsync(userId);
+                await LoadDropdownDataAsync(userId); // โหลดใหม่ถ้ากรอกผิด
                 return View(model);
             }
 
@@ -63,7 +63,7 @@ namespace PersonalFinance.Web.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
-                await PrepareDropdownsAsync(userId);
+                await LoadDropdownDataAsync(userId);
                 return View(model);
             }
         }

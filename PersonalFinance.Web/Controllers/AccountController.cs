@@ -33,13 +33,26 @@ namespace PersonalFinance.Web.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             model.UserId = userId;
 
-            // ตัด ModelState validation ที่เป็น Navigation Property ออกชั่วคราว
+            // ตัด ModelState validation ที่เป็น Navigation Property ออก
             ModelState.Remove("User");
 
             if (!ModelState.IsValid) return View(model);
 
-            // บันทึกผ่าน DbContext โดยตรงหรือผ่าน AccountService (เพื่อความรวดเร็ว ใช้ผ่าน Context หรือเพิ่ม Method ใน Service ได้ครับ)
-            // ตัวอย่างนี้แนะนำให้เพิ่มใน AccountService หรือบันทึกผ่าน Context ได้เลยครับ
+            // เรียกใช้ Service เพื่อบันทึกลง Database
+            await _accountService.CreateAccountAsync(model);
+
+            TempData["SuccessMessage"] = "เพิ่มบัญชีใหม่เรียบร้อยแล้ว";
+            return RedirectToAction(nameof(Index));
+        }
+        [HttpGet]
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            await _accountService.DeleteAccountAsync(id, userId);
+            TempData["SuccessMessage"] = "ลบบัญชีเรียบร้อยแล้ว";
             return RedirectToAction(nameof(Index));
         }
     }

@@ -1,0 +1,57 @@
+﻿@model PersonalFinance.Core.Entities.Account
+@{
+    ViewData["Title"] = "เพิ่มบัญชีใหม่";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">เพิ่มบัญชีการเงิน</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">ชื่อบัญชี</label>
+                            <input asp-for="Name" class="form-control" placeholder="เช่น กระเป๋าเงิน, SCB, KBank" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">ประเภทบัญชี</label>
+                            <select asp-for="Type" class="form-select">
+                                <option value="Cash">เงินสด (Cash)</option>
+                                <option value="Bank">บัญชีธนาคาร (Bank)</option>
+                                <option value="E-Wallet">กระเป๋าเงินอิเล็กทรอนิกส์ (E-Wallet)</option>
+                                <option value="Investment">บัญชีลงทุน (Investment)</option>
+                            </select>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">ยอดยกมาเริ่มต้น (บาท)</label>
+                                <input asp-for="Balance" class="form-control" type="number" step="0.01" value="0" />
+                                <span asp-validation-for="Balance" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">สกุลเงิน</label>
+                                <input asp-for="Currency" class="form-control" value="THB" />
+                                <span asp-validation-for="Currency" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">บันทึกบัญชี</button>
+                            <a asp-action="Index" class="btn btn-light">ย้อนกลับ</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

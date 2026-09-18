@@ -17,13 +17,10 @@ namespace PersonalFinance.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!Guid.TryParse(userIdStr, out Guid userId)) return RedirectToAction("Login", "Auth");
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var summary = await _dashboardService.GetDashboardSummaryAsync(userId);
 
-            var today = DateTime.Today;
-            var viewModel = await _dashboardService.GetDashboardSummaryAsync(userId, today.Month, today.Year);
-
-            return View(viewModel);
+            return View(summary);
         }
     }
 }

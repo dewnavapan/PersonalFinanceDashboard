@@ -1,24 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace PersonalFinance.Application.ViewModels.Dashboard
 {
     public class DashboardViewModel
     {
-        // Financial Summary
+        // สรุปยอดรวม (ภาพรวม)
         public decimal TotalBalance { get; set; }
-        public decimal NetWorth { get; set; }
-        public decimal TotalIncome { get; set; }
-        public decimal TotalExpense { get; set; }
-        public decimal SavingRate { get; set; }
-        public decimal NetCashFlow => TotalIncome - TotalExpense;
 
-        // Smart Insights
-        public List<string> SmartInsights { get; set; } = new List<string>();
+        // สรุปประจำเดือนปัจจุบัน
+        public decimal MonthlyIncome { get; set; }
+        public decimal MonthlyExpense { get; set; }
+        public decimal MonthlySaving => MonthlyIncome - MonthlyExpense;
 
-        // Chart Data (แปลงเป็น JSON string เพื่อส่งให้ Chart.js ในหน้า View)
-        public string ExpenseCategoryLabelsJson { get; set; } = "[]";
-        public string ExpenseCategoryDataJson { get; set; } = "[]";
+        // ข้อมูลสำหรับกราฟ (รายจ่ายแยกตามหมวดหมู่)
+        public Dictionary<string, decimal> ExpenseByCategory { get; set; } = new Dictionary<string, decimal>();
     }
 }

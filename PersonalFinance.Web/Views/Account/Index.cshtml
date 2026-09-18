@@ -18,8 +18,10 @@
                         <th>ประเภท</th>
                         <th>ยอดเงินคงเหลือ</th>
                         <th>สกุลเงิน</th>
+                        <th>จัดการ</th>
                     </tr>
                 </thead>
+                
                 <tbody>
                     @if (Model != null && Model.Any())
                     {
@@ -30,6 +32,11 @@
                                 <td>@item.Type</td>
                                 <td>@item.Balance.ToString("N2")</td>
                                 <td>@item.Currency</td>
+                     <td>
+                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('ต้องการลบบัญชีนี้ใช่หรือไม่? คำเตือน: หากลบบัญชี ข้อมูลธุรกรรมที่ผูกไว้อาจได้รับผลกระทบ');">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">ลบ</button>
+                    </form>
+            </td>
                             </tr>
                         }
                     }
@@ -39,6 +46,9 @@
                             <td colspan="4" class="text-center text-muted">ยังไม่มีข้อมูลบัญชี</td>
                         </tr>
                     }
+
+
+
                 </tbody>
             </table>
         </div>
