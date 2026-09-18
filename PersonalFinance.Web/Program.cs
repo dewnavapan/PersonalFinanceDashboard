@@ -26,6 +26,7 @@ builder.Services.AddScoped<IGoalService, GoalService>();
 builder.Services.AddScoped<IInvestmentService, InvestmentService>();
 builder.Services.AddScoped<INetWorthService, NetWorthService>();
 builder.Services.AddScoped<IImportExportService, ImportExportService>();
+builder.Services.AddScoped<IPortfolioService, PortfolioService>();
 
 
 

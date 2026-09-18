@@ -97,6 +97,14 @@ namespace PersonalFinance.Infrastructure.Data
             modelBuilder.Entity<Investment>()
         .Property(i => i.AssetType)
         .HasConversion<string>();
+
+            modelBuilder.Entity<PersonalFinance.Core.Entities.FinancialGoal>()
+    .Property(f => f.TargetAmount)
+    .HasPrecision(18, 4);
+
+            modelBuilder.Entity<PersonalFinance.Core.Entities.FinancialGoal>()
+                .Property(f => f.CurrentAmount)
+                .HasPrecision(18, 4);
         }
     }
 }

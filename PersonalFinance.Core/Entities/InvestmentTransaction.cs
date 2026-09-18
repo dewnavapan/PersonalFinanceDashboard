@@ -17,5 +17,7 @@ namespace PersonalFinance.Core.Entities
         public DateTime TransactionDate { get; set; }
 
         public Investment Investment { get; set; } = null!;
+
+        public DateTime Date { get; set; }
     }
 }

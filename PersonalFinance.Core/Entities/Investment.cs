@@ -21,5 +21,7 @@ namespace PersonalFinance.Core.Entities
 
         public User User { get; set; } = null!;
         public ICollection<InvestmentTransaction> Transactions { get; set; } = new List<InvestmentTransaction>();
+
+        public string Name { get; set; } = string.Empty;
     }
 }

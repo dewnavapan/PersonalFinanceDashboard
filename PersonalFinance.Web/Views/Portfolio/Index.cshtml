@@ -1,0 +1,95 @@
+﻿@model PersonalFinance.Application.ViewModels.Portfolio.PortfolioSummaryViewModel
+@{
+    ViewData["Title"] = "พอร์ตการลงทุน";
+}
+
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">พอร์ตการลงทุน</h2>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">มูลค่าตลาดรวม</h6>
+                    <h3 class="mb-0">฿@Model.TotalMarketValue.ToString("N2")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">เงินลงทุนรวม</h6>
+                    <h3 class="mb-0">฿@Model.TotalInvested.ToString("N2")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm @(Model.TotalUnrealizedProfitLoss >= 0 ? "bg-success text-white" : "bg-danger text-white")">
+                <div class="card-body">
+                    <h6>กำไร/ขาดทุน (ยังไม่รับรู้)</h6>
+                    <h3 class="mb-0">฿@Model.TotalUnrealizedProfitLoss.ToString("N2")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm @(Model.TotalRoiPercentage >= 0 ? "bg-success text-white" : "bg-danger text-white")">
+                <div class="card-body">
+                    <h6>ผลตอบแทน (ROI)</h6>
+                    <h3 class="mb-0">@Model.TotalRoiPercentage.ToString("N2")%</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assets Table -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">สินทรัพย์ของคุณ</h5>
+            <!-- แก้ไขปุ่มเป็นลิงก์ไปยังหน้าฟอร์มบันทึกธุรกรรม -->
+            <a asp-controller="Portfolio" asp-action="CreateTransaction" class="btn btn-primary btn-sm">+ เพิ่มรายการ</a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>สัญลักษณ์</th>
+                            <th>ชื่อสินทรัพย์</th>
+                            <th>ประเภท</th>
+                            <th class="text-end">จำนวน</th>
+                            <th class="text-end">ต้นทุนเฉลี่ย</th>
+                            <th class="text-end">ราคาปัจจุบัน</th>
+                            <th class="text-end">มูลค่าตลาด</th>
+                            <th class="text-end">กำไร/ขาดทุน</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var asset in Model.Assets)
+                        {
+                            <tr>
+                                <td><strong>@asset.Symbol</strong></td>
+                                <td>@asset.Name</td>
+                                <td><span class="badge bg-secondary">@asset.AssetType</span></td>
+                                <td class="text-end">@asset.TotalQuantity.ToString("N4")</td>
+                                <td class="text-end">฿@asset.AverageCost.ToString("N2")</td>
+                                <td class="text-end">฿@asset.CurrentPrice.ToString("N2")</td>
+                                <td class="text-end">฿@asset.MarketValue.ToString("N2")</td>
+                                <td class="text-end @(asset.UnrealizedProfitLoss >= 0 ? "text-success" : "text-danger")">
+                                    ฿@asset.UnrealizedProfitLoss.ToString("N2") <br />
+                                    <small>(@asset.RoiPercentage.ToString("N2")%)</small>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Assets.Any())
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center py-4 text-muted">ไม่พบข้อมูลการลงทุน เริ่มต้นสร้างพอร์ตของคุณเลย!</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
