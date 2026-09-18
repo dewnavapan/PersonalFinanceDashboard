@@ -17,6 +17,7 @@ namespace PersonalFinance.Infrastructure.Data
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<FinancialGoal> FinancialGoals { get; set; }
         public DbSet<Budget> Budgets { get; set; }
+        public DbSet<Investment> Investments { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -71,6 +72,31 @@ namespace PersonalFinance.Infrastructure.Data
                 .WithMany()
                 .HasForeignKey(b => b.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Investment>()
+        .Property(i => i.TotalQuantity).HasPrecision(18, 6);
+            modelBuilder.Entity<Investment>()
+                .Property(i => i.AverageCost).HasPrecision(18, 6);
+            modelBuilder.Entity<Investment>()
+                .Property(i => i.CurrentPrice).HasPrecision(18, 6);
+
+            modelBuilder.Entity<InvestmentTransaction>()
+                .Property(it => it.Quantity).HasPrecision(18, 6);
+            modelBuilder.Entity<InvestmentTransaction>()
+                .Property(it => it.Price).HasPrecision(18, 6);
+            modelBuilder.Entity<InvestmentTransaction>()
+                .Property(it => it.Fee).HasPrecision(18, 4);
+
+            // ตั้งค่า Cascade Delete 
+            modelBuilder.Entity<InvestmentTransaction>()
+                .HasOne(it => it.Investment)
+                .WithMany(i => i.Transactions)
+                .HasForeignKey(it => it.InvestmentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Investment>()
+        .Property(i => i.AssetType)
+        .HasConversion<string>();
         }
     }
 }

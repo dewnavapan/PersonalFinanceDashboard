@@ -23,6 +23,9 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IGoalService, GoalService>();
+builder.Services.AddScoped<IInvestmentService, InvestmentService>();
+builder.Services.AddScoped<INetWorthService, NetWorthService>();
+builder.Services.AddScoped<IImportExportService, ImportExportService>();
 
 
 

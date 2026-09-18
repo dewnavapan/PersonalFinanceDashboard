@@ -1,0 +1,129 @@
+﻿@model PersonalFinance.Application.ViewModels.Investment.PortfolioViewModel
+@{
+    ViewData["Title"] = "พอร์ตการลงทุน";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>พอร์ตการลงทุน (Investment Portfolio)</h2>
+        <a asp-action="Create" class="btn btn-primary">+ เพิ่มสินทรัพย์</a>
+    </div>
+
+    <!-- ส่วน Alert แจ้งเตือนเมื่อลบสำเร็จหรือล้มเหลว (ถ้ามี) -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- สรุปพอร์ตภาพรวม -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-light">
+                <div class="card-body">
+                    <h6 class="text-muted">มูลค่าพอร์ตปัจจุบัน</h6>
+                    <h3 class="mb-0">฿@Model.TotalCurrentValue.ToString("N2")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">เงินลงทุนทั้งหมด (ต้นทุน)</h6>
+                    <h4 class="mb-0">฿@Model.TotalInvested.ToString("N2")</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">กำไร/ขาดทุนรวม (P/L)</h6>
+                    <h4 class="@(Model.TotalProfitLoss >= 0 ? "text-success" : "text-danger") mb-0">
+                        @(Model.TotalProfitLoss > 0 ? "+" : "")฿@Model.TotalProfitLoss.ToString("N2")
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">ผลตอบแทนรวม (%)</h6>
+                    <h4 class="@(Model.TotalReturnPercentage >= 0 ? "text-success" : "text-danger") mb-0">
+                        @(Model.TotalReturnPercentage > 0 ? "+" : "")@Model.TotalReturnPercentage.ToString("N2")%
+                    </h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- รายละเอียดสินทรัพย์รายตัว -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>สินทรัพย์</th>
+                            <th>ประเภท</th>
+                            <th class="text-end">จำนวน</th>
+                            <th class="text-end">ต้นทุนเฉลี่ย</th>
+                            <th class="text-end">ราคาตลาด</th>
+                            <th class="text-end">มูลค่ารวม</th>
+                            <th class="text-end">กำไร/ขาดทุน</th>
+                            <th class="text-center">อัปเดตราคา</th>
+                            <th class="text-center">จัดการ</th> <!-- เพิ่มคอลัมน์จัดการ -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var asset in Model.Assets)
+                        {
+                            <tr>
+                                <td class="fw-bold">@asset.Symbol</td>
+                                <td><span class="badge bg-secondary">@asset.AssetType</span></td>
+                                <td class="text-end">@asset.TotalQuantity.ToString("N4")</td>
+                                <td class="text-end">฿@asset.AverageCost.ToString("N2")</td>
+                                <td class="text-end">฿@asset.CurrentPrice.ToString("N2")</td>
+                                <td class="text-end fw-bold">฿@asset.CurrentValue.ToString("N2")</td>
+                                <td class="text-end @asset.StatusColor fw-bold">
+                                    @(asset.ProfitLoss > 0 ? "+" : "")฿@asset.ProfitLoss.ToString("N2")
+                                    <br>
+                                    <small>(@(asset.ReturnPercentage > 0 ? "+" : "")@asset.ReturnPercentage.ToString("N2")%)</small>
+                                </td>
+                                <td class="text-center">
+                                    <form asp-action="UpdatePrice" method="post" class="d-flex justify-content-center gap-1">
+                                        <input type="hidden" name="id" value="@asset.Id" />
+                                        <input type="number" name="newPrice" class="form-control form-control-sm" style="width: 80px;" step="0.01" value="@asset.CurrentPrice" required>
+                                        <button type="submit" class="btn btn-sm btn-outline-success" title="บันทึกราคา"><i class="bi bi-check2"></i></button>
+                                    </form>
+                                </td>
+                                <td class="text-center">
+                                    <!-- เพิ่มฟอร์มสำหรับลบข้อมูล -->
+                                    <form asp-action="Delete" asp-route-id="@asset.Id" method="post" class="d-inline" 
+                                          onsubmit="return confirm('คุณแน่ใจหรือไม่ที่จะลบ @asset.Symbol? ข้อมูลนี้จะไม่สามารถกู้คืนได้');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="ลบข้อมูล">
+                                            <i class="bi bi-trash"></i> ลบ
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Assets.Any())
+                        {
+                           
+                            <tr><td colspan="9" class="text-center py-4 text-muted">ยังไม่มีสินทรัพย์ในพอร์ต</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

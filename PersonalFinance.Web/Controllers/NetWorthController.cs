@@ -6,20 +6,20 @@ using PersonalFinance.Application.Interfaces;
 namespace PersonalFinance.Web.Controllers
 {
     [Authorize]
-    public class DashboardController : Controller
+    public class NetWorthController : Controller
     {
-        private readonly IDashboardService _dashboardService;
+        private readonly INetWorthService _netWorthService;
 
-        public DashboardController(IDashboardService dashboardService)
+        public NetWorthController(INetWorthService netWorthService)
         {
-            _dashboardService = dashboardService;
+            _netWorthService = netWorthService;
         }
 
         public async Task<IActionResult> Index()
         {
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var model = await _dashboardService.GetDashboardSummaryAsync(userId);
-            return View(model);
+            var summary = await _netWorthService.GetNetWorthSummaryAsync(userId);
+            return View(summary);
         }
     }
 }

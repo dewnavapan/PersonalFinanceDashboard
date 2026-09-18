@@ -1,0 +1,77 @@
+﻿@model PersonalFinance.Application.ViewModels.Investment.InvestmentFormViewModel
+@{
+    ViewData["Title"] = "เพิ่มสินทรัพย์ใหม่";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>บันทึกการลงทุนใหม่</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Symbol" class="form-label">ตัวย่อสินทรัพย์ (เช่น PTT, AAPL, BTC)</label>
+                                <input asp-for="Symbol" class="form-control" style="text-transform: uppercase;" placeholder="ตัวย่อ" />
+                                <span asp-validation-for="Symbol" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="AssetType" class="form-label">ประเภทสินทรัพย์</label>
+                                <select asp-for="AssetType" class="form-select">
+                                    <option value="Stock">หุ้น (Stock)</option>
+                                    <option value="ETF">กองทุน ETF</option>
+                                    <option value="Mutual Fund">กองทุนรวม (Mutual Fund)</option>
+                                    <option value="Crypto">คริปโตเคอร์เรนซี (Crypto)</option>
+                                    <option value="Gold">ทองคำ (Gold)</option>
+                                    <option value="Other">อื่นๆ (Other)</option>
+                                </select>
+                                <span asp-validation-for="AssetType" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Name" class="form-label">ชื่อสินทรัพย์ / คำอธิบาย (Optional)</label>
+                            <input asp-for="Name" class="form-control" placeholder="เช่น ปตท, กองทุน S&P500" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label asp-for="TotalQuantity" class="form-label">จำนวนหน่วยที่มี</label>
+                                <!-- step="any" เพื่อรองรับทศนิยมหลายตำแหน่งของคริปโต -->
+                                <input asp-for="TotalQuantity" class="form-control" type="number" step="any" min="0" placeholder="0.00" />
+                                <span asp-validation-for="TotalQuantity" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="AverageCost" class="form-label">ต้นทุนเฉลี่ยต่อหน่วย</label>
+                                <input asp-for="AverageCost" class="form-control" type="number" step="any" min="0" placeholder="0.00" />
+                                <span asp-validation-for="AverageCost" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4">
+                                <label asp-for="CurrentPrice" class="form-label">ราคาตลาดปัจจุบัน</label>
+                                <input asp-for="CurrentPrice" class="form-control" type="number" step="any" min="0" placeholder="0.00" />
+                                <span asp-validation-for="CurrentPrice" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-light border small mt-4 text-muted">
+                            <i class="bi bi-info-circle me-1"></i> <strong>คำแนะนำ:</strong> สำหรับระบบเวอร์ชันนี้จะใช้การบันทึกแบบสรุปยอด (Position) หากในอนาคตมีการซื้อสินทรัพย์เดิมเพิ่ม ให้แก้ไขตัวเลข <strong>"จำนวนหน่วยรวม"</strong> และ <strong>"ต้นทุนเฉลี่ยใหม่"</strong> ทับของเดิมได้เลยครับ
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary">ยกเลิก</a>
+                            <button type="submit" class="btn btn-primary">บันทึกสินทรัพย์</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

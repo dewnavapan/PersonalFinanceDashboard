@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "นำเข้าและส่งออกข้อมูล";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Export Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-download me-2"></i>ส่งออกข้อมูล (Export)</h5>
+                </div>
+                <div class="card-body">
+                    <p>ดาวน์โหลดข้อมูลธุรกรรมทั้งหมดของคุณเป็นไฟล์ CSV เพื่อนำไปเปิดใน Excel หรือวิเคราะห์ต่อ</p>
+                    <a asp-action="ExportCsv" class="btn btn-outline-success">
+                        <i class="bi bi-filetype-csv me-2"></i>ดาวน์โหลดไฟล์ CSV
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Import Section -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-upload me-2"></i>นำเข้าข้อมูล (Import)</h5>
+                </div>
+                <div class="card-body">
+                    <p>อัปโหลดไฟล์ CSV เพื่อเพิ่มรายการธุรกรรม (รองรับเฉพาะ Income และ Expense)</p>
+                    
+                    <div class="alert alert-info small">
+                        <strong>รูปแบบไฟล์ที่รองรับ:</strong> Date, Type, Category, Amount, Account, Description<br />
+                        <em>ตัวอย่าง: 2026-05-15, Expense, Food, 150, Cash, Lunch</em>
+                    </div>
+
+                    <form asp-action="ImportCsv" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <input class="form-control" type="file" name="file" accept=".csv" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">อัปโหลดและนำเข้า</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Display -->
+    @if (ViewBag.Errors != null)
+    {
+        <div class="alert alert-warning mt-4">
+            <h5>นำเข้าข้อมูลสำเร็จ @ViewBag.SuccessCount รายการ แต่พบข้อผิดพลาดดังนี้:</h5>
+            <ul class="mb-0 text-danger">
+                @foreach (var error in ViewBag.Errors)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+        </div>
+    }
+</div>

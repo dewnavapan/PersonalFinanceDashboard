@@ -1,149 +1,164 @@
 ﻿@model PersonalFinance.Application.ViewModels.Dashboard.DashboardViewModel
 @{
-    ViewData["Title"] = "ภาพรวมการเงิน";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>ภาพรวมการเงินของคุณ (เดือนปัจจุบัน)</h2>
-        <a asp-controller="Transaction" asp-action="Create" class="btn btn-primary">+ บันทึกรายการ</a>
-    </div>
-
-    <!-- Financial Summary Cards -->
+<div class="container-fluid mt-3">
+    <!-- Summary Cards -->
     <div class="row mb-4">
         <div class="col-md-3">
-            <div class="card text-white bg-primary shadow-sm h-100">
+            <div class="card shadow-sm border-0 border-start border-primary border-4 h-100">
                 <div class="card-body">
-                    <h6 class="card-title">ยอดเงินคงเหลือรวม (Net Balance)</h6>
+                    <h6 class="text-muted">ความมั่งคั่งสุทธิ (Net Worth)</h6>
+                    <h3 class="mb-0">฿@Model.NetWorth.ToString("N2")</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 border-start border-info border-4 h-100">
+                <div class="card-body">
+                    <h6 class="text-muted">เงินคงเหลือ (Total Balance)</h6>
                     <h3 class="mb-0">฿@Model.TotalBalance.ToString("N2")</h3>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-white bg-success shadow-sm h-100">
+            <div class="card shadow-sm border-0 border-start border-success border-4 h-100">
                 <div class="card-body">
-                    <h6 class="card-title">รายรับเดือนนี้ (Income)</h6>
-                    <h3 class="mb-0">฿@Model.MonthlyIncome.ToString("N2")</h3>
+                    <h6 class="text-muted">รายรับเดือนนี้</h6>
+                    <h3 class="mb-0 text-success">฿@Model.MonthlyIncome.ToString("N2")</h3>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-white bg-danger shadow-sm h-100">
+            <div class="card shadow-sm border-0 border-start border-danger border-4 h-100">
                 <div class="card-body">
-                    <h6 class="card-title">รายจ่ายเดือนนี้ (Expense)</h6>
-                    <h3 class="mb-0">฿@Model.MonthlyExpense.ToString("N2")</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-info shadow-sm h-100">
-                <div class="card-body">
-                    <h6 class="card-title">เงินออมเดือนนี้ (Savings)</h6>
-                    <h3 class="mb-0">฿@Model.MonthlySaving.ToString("N2")</h3>
+                    <h6 class="text-muted">รายจ่ายเดือนนี้</h6>
+                    <h3 class="mb-0 text-danger">฿@Model.MonthlyExpense.ToString("N2")</h3>
+                    <small class="text-muted">อัตราการออม: @Model.SavingRate.ToString("0.0")%</small>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Charts Section -->
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm h-100">
+    <div class="row mb-4">
+        <!-- Bar Chart: 6-Month Cash Flow -->
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 h-100">
                 <div class="card-header bg-white">
-                    <h5 class="mb-0">สัดส่วนรายจ่ายแยกตามหมวดหมู่</h5>
+                    <h6 class="mb-0">กระแสเงินสด (6 เดือนย้อนหลัง)</h6>
                 </div>
-                <div class="card-body d-flex justify-content-center">
-                    @if (Model.ExpenseByCategory.Any())
-                    {
-                        <canvas id="expenseCategoryChart" style="max-height: 300px;"></canvas>
-                    }
-                    else
-                    {
-                        <p class="text-muted mt-5">ยังไม่มีข้อมูลรายจ่ายในเดือนนี้</p>
-                    }
+                <div class="card-body">
+                    <canvas id="cashFlowChart" height="100"></canvas>
                 </div>
             </div>
         </div>
-        
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm h-100">
+        <!-- Doughnut Chart: Expense By Category -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
                 <div class="card-header bg-white">
-                    <h5 class="mb-0">ภาพรวมกระแสเงินสด (Cash Flow)</h5>
+                    <h6 class="mb-0">สัดส่วนรายจ่าย (เดือนนี้)</h6>
                 </div>
                 <div class="card-body d-flex justify-content-center">
-                    <canvas id="cashFlowChart" style="max-height: 300px;"></canvas>
+                    <canvas id="expenseChart" height="200"></canvas>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white">
+            <h6 class="mb-0">รายการล่าสุด</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>วันที่</th>
+                            <th>รายการ</th>
+                            <th>หมวดหมู่</th>
+                            <th class="text-end">จำนวนเงิน</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tx in Model.RecentTransactions)
+                        {
+                            <tr>
+                                <td>@tx.Date</td>
+                                <td>@tx.Description</td>
+                                <td><span class="badge bg-secondary">@tx.CategoryName</span></td>
+                                <td class="text-end fw-bold @(tx.Type == "Income" ? "text-success" : (tx.Type == "Expense" ? "text-danger" : "text-primary"))">
+                                    @(tx.Type == "Income" ? "+" : (tx.Type == "Expense" ? "-" : ""))฿@tx.Amount.ToString("N2")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
-@section Scripts {
-    <!-- เรียกใช้ Chart.js จาก CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            
-            // 1. กราฟ Expense by Category (Doughnut Chart)
-            const expenseData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ExpenseByCategory));
-            const categoryLabels = Object.keys(expenseData);
-            const categoryValues = Object.values(expenseData);
+<!-- โหลด Chart.js จาก CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // ดึงข้อมูล JSON จาก ViewModel
+        const expenseLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ExpenseCategoryLabels));
+        const expenseData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ExpenseCategoryData));
+        
+        const cfLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CashFlowLabels));
+        const cfIncome = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CashFlowIncomeData));
+        const cfExpense = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CashFlowExpenseData));
 
-            if (categoryLabels.length > 0) {
-                const ctxCategory = document.getElementById('expenseCategoryChart').getContext('2d');
-                new Chart(ctxCategory, {
-                    type: 'doughnut',
-                    data: {
-                        labels: categoryLabels,
-                        datasets: [{
-                            data: categoryValues,
-                            backgroundColor: [
-                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { position: 'bottom' }
-                        }
-                    }
-                });
+        // 1. Render Expense Doughnut Chart
+        const ctxExpense = document.getElementById('expenseChart').getContext('2d');
+        new Chart(ctxExpense, {
+            type: 'doughnut',
+            data: {
+                labels: expenseLabels,
+                datasets: [{
+                    data: expenseData,
+                    backgroundColor: ['#ff6384', '#36a2eb', '#cc65fe', '#ffce56', '#4bc0c0', '#f77825', '#9966ff'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right' } }
             }
-
-            // 2. กราฟ Cash Flow (Bar Chart)
-            const ctxCashFlow = document.getElementById('cashFlowChart').getContext('2d');
-            new Chart(ctxCashFlow, {
-                type: 'bar',
-                data: {
-                    labels: ['รายรับ', 'รายจ่าย', 'เงินออม'],
-                    datasets: [{
-                        label: 'ยอดเงิน (บาท)',
-                        data: [@Model.MonthlyIncome, @Model.MonthlyExpense, @Model.MonthlySaving],
-                        backgroundColor: [
-                            'rgba(75, 192, 192, 0.6)', // สีเขียว
-                            'rgba(255, 99, 132, 0.6)', // สีแดง
-                            'rgba(54, 162, 235, 0.6)'  // สีฟ้า
-                        ],
-                        borderColor: [
-                            'rgb(75, 192, 192)',
-                            'rgb(255, 99, 132)',
-                            'rgb(54, 162, 235)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: { beginAtZero: true }
-                    },
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
         });
-    </script>
-}
+
+        // 2. Render Cash Flow Bar Chart
+        const ctxCashFlow = document.getElementById('cashFlowChart').getContext('2d');
+        new Chart(ctxCashFlow, {
+            type: 'bar',
+            data: {
+                labels: cfLabels,
+                datasets: [
+                    {
+                        label: 'รายรับ',
+                        data: cfIncome,
+                        backgroundColor: '#28a745',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'รายจ่าย',
+                        data: cfExpense,
+                        backgroundColor: '#dc3545',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'top' } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    });
+</script>
